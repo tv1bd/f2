@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Free Fire Like Bot - Smart Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark: #1f2937;
+            --light: #f9fafb;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        /* Auto Refresh Status Banner */
+        .auto-refresh-banner {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .auto-refresh-banner h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .refresh-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .refresh-info-box {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .refresh-info-box h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .refresh-info-box p {
+            font-size: 0.9rem;
+            opacity: 0.95;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result.success {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            color: #065f46;
+        }
+
+        .result.error {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            color: #991b1b;
+        }
+
+        .result.info {
+            background: #dbeafe;
+            border: 2px solid #3b82f6;
+            color: #1e40af;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-box h3 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-box p {
+            font-size: 0.9rem;
+            opacity: 0.95;
+        }
+
+        .token-details-container {
+            max-height: 600px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .token-summary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            text-align: center;
+        }
+
+        .token-summary h3 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .token-detail-box {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s;
+        }
+
+        .token-detail-box:hover {
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .token-detail-box h4 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .token-info {
+            display: grid;
+            gap: 10px;
+        }
+
+        .token-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .token-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .token-info-row strong {
+            color: #6b7280;
+        }
+
+        .expiry-warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            color: #92400e;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Free Fire Like Bot Dashboard</h1>
+            <p>স্মার্ট টোকেন ম্যানেজমেন্ট সিস্টেম</p>
+        </div>
+
+        <!-- Auto Refresh Status -->
+        <div class="auto-refresh-banner" id="autoRefreshBanner">
+            <h2>🔄 অটো টোকেন রিফ্রেশ সিস্টেম</h2>
+            <div class="refresh-info">
+                <div class="refresh-info-box">
+                    <h3 id="nextRefreshTime">লোড হচ্ছে...</h3>
+                    <p>পরবর্তী রিফ্রেশ</p>
+                </div>
+                <div class="refresh-info-box">
+                    <h3 id="timeRemaining">লোড হচ্ছে...</h3>
+                    <p>বাকি সময়</p>
+                </div>
+                <div class="refresh-info-box">
+                    <h3>প্রতি ৪ ঘণ্টা</h3>
+                    <p>রিফ্রেশ ইন্টারভাল</p>
+                </div>
+                <div class="refresh-info-box">
+                    <h3 id="schedulerStatus">🟢 চালু</h3>
+                    <p>সিস্টেম স্ট্যাটাস</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <!-- Send Likes -->
+            <div class="card">
+                <h2>💝 লাইক পাঠান</h2>
+                <form id="likeForm">
+                    <div class="form-group">
+                        <label>প্লেয়ার UID</label>
+                        <input type="text" id="uid" placeholder="UID লিখুন" required>
+                    </div>
+                    <div class="form-group">
+                        <label>সার্ভার</label>
+                        <select id="server" required>
+                            <option value="BD">🇧🇩 বাংলাদেশ (BD)</option>
+                            <option value="IND">🇮🇳 ভারত (IND)</option>
+                            <option value="BR">🇧🇷 ব্রাজিল (BR)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">লাইক পাঠান</button>
+                </form>
+                <div class="loading" id="likeLoading">
+                    <div class="spinner"></div>
+                    <p>লাইক পাঠানো হচ্ছে...</p>
+                </div>
+                <div class="result" id="likeResult"></div>
+            </div>
+
+            <!-- Token Stats -->
+            <div class="card">
+                <h2>📊 টোকেন পরিসংখ্যান</h2>
+                <button class="btn btn-info" onclick="loadTokenStats()">🔄 রিফ্রেশ করুন</button>
+                <div class="stats-grid" id="tokenStats">
+                    <div class="stat-box">
+                        <h3>-</h3>
+                        <p>লোড হচ্ছে...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Token Expiry Info -->
+            <div class="card">
+                <h2>⏰ টোকেন মেয়াদ তথ্য</h2>
+                <div class="form-group">
+                    <label>সার্ভার নির্বাচন করুন</label>
+                    <select id="serverSelect">
+                        <option value="BD">🇧🇩 বাংলাদেশ (BD)</option>
+                        <option value="IND">🇮🇳 ভারত (IND)</option>
+                        <option value="BR">🇧🇷 ব্রাজিল (BR)</option>
+                    </select>
+                </div>
+                <button class="btn btn-info" onclick="viewTokenDetails()">টোকেন বিস্তারিত দেখুন</button>
+                <div class="loading" id="detailsLoading">
+                    <div class="spinner"></div>
+                </div>
+                <div class="result" id="tokenDetailsResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load scheduler status on page load
+        window.addEventListener('load', () => {
+            loadSchedulerStatus();
+            loadTokenStats();
+            // Refresh scheduler status every 30 seconds
+            setInterval(loadSchedulerStatus, 30000);
+        });
+
+        // Load Scheduler Status
+        async function loadSchedulerStatus() {
+            try {
+                const response = await fetch('/scheduler_status');
+                const data = await response.json();
+                
+                if (data.jobs && data.jobs.length > 0) {
+                    const job = data.jobs.find(j => j.id === 'fast_smart_token_refresh_job') || data.jobs[0];
+                    
+                    document.getElementById('nextRefreshTime').textContent = job.next_run_time || 'N/A';
+                    document.getElementById('timeRemaining').textContent = job.time_remaining || 'N/A';
+                    document.getElementById('schedulerStatus').textContent = data.status;
+                }
+            } catch (error) {
+                console.error('Failed to load scheduler status:', error);
+            }
+        }
+
+        // Send Likes
+        document.getElementById('likeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const uid = document.getElementById('uid').value;
+            const server = document.getElementById('server').value;
+            
+            const loading = document.getElementById('likeLoading');
+            const result = document.getElementById('likeResult');
+            const btn = e.target.querySelector('button');
+            
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch(`/like?uid=${uid}&server_name=${server}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.className = 'result success';
+                    result.innerHTML = `
+                        <h3>✅ সফল!</h3>
+                        <p><strong>প্লেয়ার:</strong> ${data.PlayerNickname} (${data.UID})</p>
+                        <p><strong>লাইক দেওয়া হয়েছে:</strong> ${data.LikesGivenByAPI}</p>
+                        <p><strong>আগে:</strong> ${data.LikesbeforeCommand}</p>
+                        <p><strong>পরে:</strong> ${data.LikesafterCommand}</p>
+                    `;
+                } else {
+                    throw new Error(data.error || 'লাইক পাঠাতে ব্যর্থ');
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `<h3>❌ ত্রুটি</h3><p>${error.message}</p>`;
+            } finally {
+                loading.style.display = 'none';
+                result.style.display = 'block';
+                btn.disabled = false;
+            }
+        });
+
+        // Load Token Stats
+        async function loadTokenStats() {
+            const statsDiv = document.getElementById('tokenStats');
+            
+            try {
+                const response = await fetch('/token_info');
+                const data = await response.json();
+                
+                let html = '';
+                for (const [server, counts] of Object.entries(data)) {
+                    html += `
+                        <div class="stat-box">
+                            <h3>${counts.regular_tokens}</h3>
+                            <p>${server} টোকেন</p>
+                        </div>
+                    `;
+                }
+                statsDiv.innerHTML = html;
+            } catch (error) {
+                statsDiv.innerHTML = '<p style="color: red; padding: 20px;">লোড করতে ব্যর্থ</p>';
+            }
+        }
+
+        // View Token Details
+        async function viewTokenDetails() {
+            const server = document.getElementById('serverSelect').value;
+            const loading = document.getElementById('detailsLoading');
+            const result = document.getElementById('tokenDetailsResult');
+            
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            
+            try {
+                const response = await fetch(`/token_details?server=${server}`);
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    result.className = 'result info';
+                    
+                    const summary = data.summary || {};
+                    
+                    let html = `
+                        <div class="token-summary">
+                            <div>
+                                <h3>${summary.total_tokens || 0}</h3>
+                                <p>মোট টোকেন</p>
+                            </div>
+                            <div>
+                                <h3 style="color: #10b981;">${summary.valid_tokens || 0}</h3>
+                                <p>বৈধ ✅</p>
+                            </div>
+                            <div>
+                                <h3 style="color: #f59e0b;">${summary.expiring_soon || 0}</h3>
+                                <p>শীঘ্রই মেয়াদ শেষ ⚠️</p>
+                            </div>
+                            <div>
+                                <h3>${summary.total_visit_tokens || 0}</h3>
+                                <p>ভিজিট টোকেন</p>
+                            </div>
+                        </div>
+                        <div class="token-details-container">
+                    `;
+                    
+                    // Show first 10 tokens
+                    const tokensToShow = data.tokens.slice(0, 10);
+                    
+                    tokensToShow.forEach((token, index) => {
+                        const isValid = token.is_valid;
+                        const expiringSoon = token.expires_soon;
+                        const hoursLeft = token.hours_until_expiry || 0;
+                        
+                        let statusBadge = '';
+                        if (!isValid) {
+                            statusBadge = '<span class="badge badge-danger">মেয়াদ শেষ</span>';
+                        } else if (expiringSoon) {
+                            statusBadge = '<span class="badge badge-warning">শীঘ্রই মেয়াদ শেষ</span>';
+                        } else {
+                            statusBadge = '<span class="badge badge-success">বৈধ</span>';
+                        }
+                        
+                        html += `
+                            <div class="token-detail-box">
+                                <h4>
+                                    <span>টোকেন #${index + 1}</span>
+                                    ${statusBadge}
+                                </h4>
+                                <div class="token-info">
+                                    <div class="token-info-row">
+                                        <strong>অ্যাকাউন্ট ID:</strong>
+                                        <span>${token.account_id || 'N/A'}</span>
+                                    </div>
+                                    <div class="token-info-row">
+                                        <strong>নিকনেম:</strong>
+                                        <span>${token.nickname || 'N/A'}</span>
+                                    </div>
+                                    <div class="token-info-row">
+                                        <strong>মেয়াদ শেষ:</strong>
+                                        <span>${token.expiry_date || 'N/A'}</span>
+                                    </div>
+                                    <div class="token-info-row">
+                                        <strong>বাকি সময়:</strong>
+                                        <span style="color: ${hoursLeft < 24 ? '#ef4444' : '#10b981'}; font-weight: 700;">
+                                            ${hoursLeft.toFixed(1)} ঘণ্টা
+                                        </span>
+                                    </div>
+                                </div>
+                                ${expiringSoon ? '<div class="expiry-warning">⚠️ এই টোকেনটি শীঘ্রই মেয়াদ শেষ হবে। অটো রিফ্রেশ সিস্টেম নতুন টোকেন তৈরি করবে।</div>' : ''}
+                            </div>
+                        `;
+                    });
+                    
+                    html += `</div>`;
+                    
+                    if (data.tokens.length > 10) {
+                        html += `<p style="text-align: center; margin-top: 15px; color: #6b7280;">প্রথম ১০টি টোকেন দেখানো হয়েছে। মোট: ${data.tokens.length}</p>`;
+                    }
+                    
+                    result.innerHTML = html;
+                } else {
+                    throw new Error(data.message || 'টোকেন লোড করতে ব্যর্থ');
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `<h3>❌ ত্রুটি</h3><p>${error.message}</p>`;
+            } finally {
+                loading.style.display = 'none';
+                result.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
